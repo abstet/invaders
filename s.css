@@ -1,0 +1,52 @@
+html {
+	width: 100%;
+	height: 100%;
+	font-family:Arial, Sans Serif;
+}
+body {
+	margin: 0;
+	padding: 0;
+	background: black;
+	color: white;
+	vertical-align: middle;
+	text-align: center;
+}
+body:after {
+	content: 
+		url(sprites/ship1.png) 
+		url(sprites/ship2.png) 
+		url(sprites/ship3.png) 
+		url(sprites/ship4.png) 
+		url(sprites/ship5.png) 
+		url(sprites/shipgone.png) 
+		url(sprites/cannon.png) 
+		url(sprites/cannonbullet.png)
+		;
+	display: none;
+}
+audio {
+	display: none;
+}
+#area {
+	display: inline-block;	
+	margin: 0 auto;
+	background: !transparent;	
+}
+#legend {	
+	line-height: 1.3rem;
+	font-size: 0.85rem;
+	text-align: center;
+	margin: 2rem;
+	color: #666;
+}
+#legend span { 
+	padding: 0 1em;
+}
+#legend b {
+	color: #ccc;
+}
+#fps {
+	margin: 1rem 0;
+	color: #555;
+	font-size: .9rem;
+}

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><![endif]-->
+<meta name="HandheldFriendly" content="true">
+<script>
+/*
+* @ops mandatory are:
+* 	context: 2d canvas context
+* 	image: image url
+*   size: square sprite width or height
+*/
+var Sprite = function (ops) {
+	this._context = ops['context'] || null;
+	this._size = ops['size'] || 32;
+	this._speed = ops['speed'] || 30;	
+	this._left = ops['left'] || 0;
+	this._top = ops['top'] || 0;
+	this._infinite = ops['infinite'] || 1;	
+	this._frame = 0;
+	
+	// image
+	this._img = new Image();	
+	this._img.src = ops['image'];	
+	this._img.onload = function() {/*no need to do. see at css body:after*/};
+	this._img.onerror = function() {
+		console.error('Cannot load sprite file '+url);		
+	}
+	
+	this.move = function(left, top) {
+		this._left = left;
+		this._top = top;
+		this.render(this._left, this._top, this._frame);
+	}
+	
+	this.top = function() {
+		return this._top;
+	}
+	
+	this.left = function() {
+		return this._left;
+	}
+	
+	this.slide = function(dx, dy) {
+		this._context.fillRect(this._left, this._top, this._size,this._size);
+		this.render(this._left+dx, this._top + dy, this._frame);
+	}
+	
+	this.stop = function() {
+		window.clearInterval(this.pid);
+		this.pid = 0;
+	}		
+	
+	this.tick = function() {
+		++this._frame;
+		this.render(this._left, this._top, this._frame);
+	}
+	
+	this.render = function(left, top, frame) {
+		if (this._context == null) {
+			console.warn('Need to set context to sprite');
+			return;
+		}	
+	
+		if (!this._img.naturalWidth) {
+			return;
+		} 
+
+		this._left = left;
+		this._top = top;
+		
+		// outside sprite
+		if ((frame * this._size) >= (this._img.naturalWidth * (this._img.naturalHeight / this._size))) {
+			if (this._infinite) {
+				this._frame = 0;
+			} else {
+				return;
+			}
+		}
+
+		this._context.fillRect(this._left, this._top, this._size, this._size);		
+		this._context.drawImage(this._img, 
+			(this._frame * this._size) % this._img.naturalWidth, 
+			Math.floor((this._frame * this._size) / this._img.naturalWidth) * this._size,
+			this._size, 
+			this._size, 
+			this._left, 
+			this._top, 
+			this._size, 
+			this._size);
+	}
+	
+	this.render(this._left, this._top, this._frame);	
+}
+
+var Ships = function(ops) {
+	var _context = ops['context'] || null;
+	var _left = ops['cols'] || 0;
+	var _top = ops['cols'] || 0;
+	var _cols = ops['cols'] || 10;
+	var _rows = ops['rows'] || 4;
+	var _size = ops['size'] || 40;
+
+	var _horizontal_speed = ops['_horizontal_speed'] || 5; // in 'ticks'
+	var _vertical_speed = ops['_vertical_speed'] || 30; // in 'ticks'
+	
+	var _dx = ops['_dx'] || 2; 
+	var _dy = ops['_dy'] || 10; 
+	
+	var _space = ops['space'] || 20; // spaces between ships
+	
+	var _ships = [];
+	for(i = 0; i < (_cols * _rows); ++i) {
+		var s = new Sprite({
+			context: _context,		
+			image: 'sprites/ship.png',
+			size: _size
+		});
+		_ships.push(s);
+	}
+	
+	render = function() {
+		for(i = 0; i < (_cols * _rows); ++i) {	
+			_ships[i].move(
+				_left + (i % _cols)  * (_size + _space / 2), 
+				_top  + Math.floor(i / _cols) * (_size + _space / 2)
+			);
+		}
+	}
+		
+	var ticks = 1;
+	this.tick = function() {
+		if (!(ticks %_vertical_speed)) {
+			_context.fillRect(_left, _top, _cols * (_size + _space / 2) ,  _rows * (_size + _space / 2));		
+			_top += _dy;
+			render();
+		}
+		
+		if (!(ticks % _horizontal_speed)) {
+			_context.fillRect(_left, _top, _cols * (_size + _space / 2),  _rows * (_size + _space / 2));				
+			if ((Math.random() - 0.5) > 0) {
+				_left += _dx;
+			} else {
+				_left -= _dx;			
+			}
+			render();
+		}
+		
+	
+		_ships.forEach(function(e){
+			e.tick();
+		});
+		++ticks;
+	}
+	
+	render();
+}
+
+</script>
+<style>
+body {
+	background: black;
+}
+body:after {
+  content: url(sprites/cannon.png) url(sprites/bullet.png);
+  display: none;
+}
+#area {
+ background: !transparent;
+}
+</style>
+</head>
+<body>
+
+<canvas id="area" height="600" width="800">
+Sorry, your browser doesn't support canvas technology
+</canvas>
+
+<script>
+window.onload = function(){
+	ships = new Ships({
+		context: document.getElementById("area").getContext("2d")
+	});
+	
+	setInterval(function() {
+			ships.tick();
+		}, 100);
+}
+</script>
+</body>
+</html>

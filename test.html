@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>"Space Invaders" by Max Bukurov</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><![endif]-->
+<meta name="HandheldFriendly" content="true">
+
+<link href="s.css" rel="stylesheet">
+</head>
+<body>
+
+<div id="uuu" style="color: white;">ddd</div>
+<script>
+
+function addEvent(element, event, fn) {
+    if (element.addEventListener) {
+        element.addEventListener(event, fn, false);
+	}
+    else if (element.attachEvent) {
+        element.attachEvent('on' + event, fn);
+	}
+}
+
+
+window.addEvent(window, "load",	function(e) {
+	addEvent(window, 'touchmove', function(e){
+		document.getElementById('uuu').innerHTML = e.targetTouches[0].pageX;
+	});
+	
+
+	addEvent(window, 'mousemove', function(e) {
+			document.title = 'mousemove ' +  e.pageX ;
+	});
+});
+</script>
+</body>
+</html>
